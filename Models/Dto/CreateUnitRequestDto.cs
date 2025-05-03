@@ -6,8 +6,10 @@
         public string Type { get; set; }
         public int Bathrooms { get; set; }
         public double Size { get; set; }
-        public int NoOfUnits { get; set; }
-        public string PropertyId { get; set; }
+        public int Floor { get; set; }
+        public string Doornumber { get; set; }
+        public string Status { get; set; }
+        public long PropertyId { get; set; }
 
     }
 }

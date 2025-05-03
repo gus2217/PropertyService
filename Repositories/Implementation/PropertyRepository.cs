@@ -1,4 +1,5 @@
 ﻿using KejaHUnt_PropertiesAPI.Data;
+using KejaHUnt_PropertiesAPI.Migrations;
 using KejaHUnt_PropertiesAPI.Models.Domain;
 using KejaHUnt_PropertiesAPI.Models.Dto;
 using KejaHUnt_PropertiesAPI.Repositories.Interface;
@@ -61,31 +62,15 @@ namespace KejaHUnt_PropertiesAPI.Repositories.Implementation
             existingProperty.Name = property.Name;
             existingProperty.Location = property.Location;
             existingProperty.Type = property.Type;
-            existingProperty.DocumentId = property.DocumentId;
-
-            // Hold new units in a temporary list
-            List<Unit> newUnits = new List<Unit>();
-
-            if (property.Units != null && property.Units.Any())
+            if (property.DocumentId != null && property.DocumentId != Guid.Empty)
             {
-                foreach (var incomingUnit in property.Units)
-                {
-                    newUnits.Add(new Unit
-                    {
-                        Price = incomingUnit.Price,
-                        Type = incomingUnit.Type,
-                        Bathrooms = incomingUnit.Bathrooms,
-                        Size = incomingUnit.Size,
-                        NoOfUnits = incomingUnit.NoOfUnits,
-                        DocumentId = incomingUnit.DocumentId,
-                        PropertyId = existingProperty.Id
-                    });
-                }
+                existingProperty.DocumentId = property.DocumentId;
             }
-
-
-            // Add the new units to the existing property
-            existingProperty.Units = newUnits;
+            else
+            {
+                // If the document ID is not provided, keep the existing one
+                existingProperty.DocumentId = existingProperty.DocumentId;
+            }
 
             // Save changes
             await _dbContext.SaveChangesAsync();

@@ -37,7 +37,9 @@ namespace KejaHUnt_PropertiesAPI.Migrations
                     Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Bathrooms = table.Column<int>(type: "int", nullable: false),
                     Size = table.Column<double>(type: "float", nullable: false),
-                    NoOfUnits = table.Column<int>(type: "int", nullable: false),
+                    Floor = table.Column<int>(type: "int", nullable: false),
+                    DoorNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DocumentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     PropertyId = table.Column<long>(type: "bigint", nullable: false)
                 },

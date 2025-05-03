@@ -64,7 +64,11 @@ namespace KejaHUnt_PropertiesAPI.Migrations
                     b.Property<Guid?>("DocumentId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("NoOfUnits")
+                    b.Property<string>("DoorNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Floor")
                         .HasColumnType("int");
 
                     b.Property<decimal>("Price")
@@ -76,6 +80,10 @@ namespace KejaHUnt_PropertiesAPI.Migrations
 
                     b.Property<double>("Size")
                         .HasColumnType("float");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Type")
                         .IsRequired()

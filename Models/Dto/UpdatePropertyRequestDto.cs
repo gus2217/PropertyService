@@ -5,6 +5,7 @@ namespace KejaHUnt_PropertiesAPI.Models.Dto
 {
     public class UpdatePropertyRequestDto
     {
+        public long Id { get; set; }
         public string Name { get; set; }
         public string Location { get; set; }
         public string Type { get; set; }

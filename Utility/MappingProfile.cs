@@ -11,17 +11,15 @@ namespace KejaHUnt_PropertiesAPI.Utility
         public MappingProfile()
         {
             // Property -> CreatePropertyRequestDto
-            CreateMap<Property, CreatePropertyRequestDto>()
-                .ForMember(dest => dest.Units, opt => opt.MapFrom(src => JsonConvert.SerializeObject(src.Units)));
+            CreateMap<Property, CreatePropertyRequestDto>().ReverseMap();
 
             // CreatePropertyRequestDto -> Property
-            CreateMap<CreatePropertyRequestDto, Property>()
-                .ForMember(dest => dest.Units, opt => opt.MapFrom(src =>
-                    string.IsNullOrEmpty(src.Units)
-                        ? new List<Unit>()
-                        : JsonConvert.DeserializeObject<List<Unit>>(src.Units)));
+            CreateMap<CreatePropertyRequestDto, Property>().ReverseMap();
+
 
             CreateMap<Unit, CreateUnitRequestDto>().ReverseMap();
+
+            CreateMap<UpdatePropertyRequestDto, Property>();
 
             CreateMap<Unit, UnitDto>().ReverseMap();
             

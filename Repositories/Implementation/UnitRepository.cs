@@ -1,5 +1,6 @@
 ﻿using KejaHUnt_PropertiesAPI.Data;
 using KejaHUnt_PropertiesAPI.Models.Domain;
+using KejaHUnt_PropertiesAPI.Models.Dto;
 using KejaHUnt_PropertiesAPI.Repositories.Interface;
 using Microsoft.EntityFrameworkCore;
 
@@ -36,6 +37,7 @@ namespace KejaHUnt_PropertiesAPI.Repositories.Implementation
 
         public async Task<IEnumerable<Unit>> GetAllAsync()
         {
+            //fetch only open units.......where status is not booked or reserved
             return await _dbContext.Units.ToListAsync();
         }
 
@@ -57,9 +59,19 @@ namespace KejaHUnt_PropertiesAPI.Repositories.Implementation
             existingUnit.Type = unit.Type;
             existingUnit.Bathrooms = unit.Bathrooms;
             existingUnit.Size = unit.Size;
-            existingUnit.NoOfUnits = unit.NoOfUnits;
+            existingUnit.Floor = unit.Floor;
+            existingUnit.DoorNumber = unit.DoorNumber;
+            existingUnit.Status = unit.Status;
             existingUnit.PropertyId = unit.PropertyId;
-            existingUnit.DocumentId = unit.DocumentId;
+            if(unit.DocumentId != null && unit.DocumentId != Guid.Empty)
+            {
+                existingUnit.DocumentId = unit.DocumentId;
+            }
+            else
+            {
+                // If the document ID is not provided, keep the existing one
+                existingUnit.DocumentId = existingUnit.DocumentId;
+            }
 
             // Save changes
             await _dbContext.SaveChangesAsync();
@@ -72,6 +84,31 @@ namespace KejaHUnt_PropertiesAPI.Repositories.Implementation
             return await _dbContext.Units
                 .Where(u => u.PropertyId == propertyId)
                 .ToListAsync();
+        }
+
+        public async Task<Unit?> UpdateUnitStatusAsync(UnitStatusDto request)
+        {
+            var existingUnit = await _dbContext.Units.FirstOrDefaultAsync(x => x.Id == request.UnitId);
+
+            if (existingUnit == null)
+            {
+                return null;
+            }
+
+            // Block if trying to book a unit that is already Booked or Reserved
+            if ((request.Status == "Booked" || request.Status == "Reserved") &&
+                (existingUnit.Status == "Booked" || existingUnit.Status == "Reserved"))
+            {
+                // You can also throw a custom exception here if needed
+                return null;
+            }
+
+            // Update the Status string directly
+            existingUnit.Status = request.Status;
+
+            await _dbContext.SaveChangesAsync();
+
+            return existingUnit;
         }
 
     }

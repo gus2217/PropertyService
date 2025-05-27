@@ -4,6 +4,7 @@ using KejaHUnt_PropertiesAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KejaHUnt_PropertiesAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250506160150_addedPolicy")]
+    partial class addedPolicy
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -39,13 +42,13 @@ namespace KejaHUnt_PropertiesAPI.Migrations
 
             modelBuilder.Entity("IndoorFeaturesProperty", b =>
                 {
-                    b.Property<long>("IndoorFeaturesId")
+                    b.Property<long>("IdoorFeaturesId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("PropertiesId")
                         .HasColumnType("bigint");
 
-                    b.HasKey("IndoorFeaturesId", "PropertiesId");
+                    b.HasKey("IdoorFeaturesId", "PropertiesId");
 
                     b.HasIndex("PropertiesId");
 
@@ -135,14 +138,9 @@ namespace KejaHUnt_PropertiesAPI.Migrations
                     b.Property<long>("PolicyId")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("PropertyId")
-                        .HasColumnType("bigint");
-
                     b.HasKey("Id");
 
                     b.HasIndex("PolicyId");
-
-                    b.HasIndex("PropertyId");
 
                     b.ToTable("PolicyDescriptions");
                 });
@@ -240,6 +238,21 @@ namespace KejaHUnt_PropertiesAPI.Migrations
                     b.ToTable("OutDoorFeaturesProperty");
                 });
 
+            modelBuilder.Entity("PolicyProperty", b =>
+                {
+                    b.Property<long>("PoliciesId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("PropertiesId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("PoliciesId", "PropertiesId");
+
+                    b.HasIndex("PropertiesId");
+
+                    b.ToTable("PolicyProperty");
+                });
+
             modelBuilder.Entity("GeneralFeaturesProperty", b =>
                 {
                     b.HasOne("KejaHUnt_PropertiesAPI.Models.Domain.GeneralFeatures", null)
@@ -259,7 +272,7 @@ namespace KejaHUnt_PropertiesAPI.Migrations
                 {
                     b.HasOne("KejaHUnt_PropertiesAPI.Models.Domain.IndoorFeatures", null)
                         .WithMany()
-                        .HasForeignKey("IndoorFeaturesId")
+                        .HasForeignKey("IdoorFeaturesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -278,15 +291,7 @@ namespace KejaHUnt_PropertiesAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("KejaHUnt_PropertiesAPI.Models.Domain.Property", "Property")
-                        .WithMany("PolicyDescriptions")
-                        .HasForeignKey("PropertyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Policy");
-
-                    b.Navigation("Property");
                 });
 
             modelBuilder.Entity("KejaHUnt_PropertiesAPI.Models.Domain.Unit", b =>
@@ -315,6 +320,21 @@ namespace KejaHUnt_PropertiesAPI.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("PolicyProperty", b =>
+                {
+                    b.HasOne("KejaHUnt_PropertiesAPI.Models.Domain.Policy", null)
+                        .WithMany()
+                        .HasForeignKey("PoliciesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("KejaHUnt_PropertiesAPI.Models.Domain.Property", null)
+                        .WithMany()
+                        .HasForeignKey("PropertiesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("KejaHUnt_PropertiesAPI.Models.Domain.Policy", b =>
                 {
                     b.Navigation("PolicyDescriptions");
@@ -322,8 +342,6 @@ namespace KejaHUnt_PropertiesAPI.Migrations
 
             modelBuilder.Entity("KejaHUnt_PropertiesAPI.Models.Domain.Property", b =>
                 {
-                    b.Navigation("PolicyDescriptions");
-
                     b.Navigation("Units");
                 });
 #pragma warning restore 612, 618

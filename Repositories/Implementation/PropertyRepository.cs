@@ -1,4 +1,5 @@
 ﻿using KejaHUnt_PropertiesAPI.Data;
+using KejaHUnt_PropertiesAPI.Migrations;
 using KejaHUnt_PropertiesAPI.Models.Domain;
 using KejaHUnt_PropertiesAPI.Models.Dto;
 using KejaHUnt_PropertiesAPI.Repositories.Interface;
@@ -15,12 +16,30 @@ namespace KejaHUnt_PropertiesAPI.Repositories.Implementation
             _dbContext = dbContext;
         }
 
-        public async Task<Property> CreatePropertyAsync(Property property)
+        public async Task<Property> CreatePropertyAsync(Property property, long[] generalFeatureIds, long[] indoorFeaturesIds, long[] outdoorFeaturesIds)
         {
+            // Fetch the actual GeneralFeatures from DB using IDs
+            var features = await _dbContext.GeneralFeatures
+                .Where(f => generalFeatureIds.Contains(f.Id))
+                .ToListAsync();
+            var indoorFeatures = await _dbContext.IndoorFeatures
+                .Where(f => indoorFeaturesIds.Contains(f.Id))
+                .ToListAsync();
+            var outDoorFeatures = await _dbContext.OutDoorFeatures
+                .Where(f => outdoorFeaturesIds.Contains(f.Id))
+                .ToListAsync();
+
+            // Assign features to property
+            property.GeneralFeatures = features;
+            property.IndoorFeatures = indoorFeatures;
+            property.OutdoorFeatures = outDoorFeatures;
+
             await _dbContext.Properties.AddAsync(property);
             await _dbContext.SaveChangesAsync();
+
             return property;
         }
+
 
         public async Task<Property?> DeleteAync(long id)
         {
@@ -38,12 +57,12 @@ namespace KejaHUnt_PropertiesAPI.Repositories.Implementation
 
         public async Task<IEnumerable<Property>> GetAllAsync()
         {
-            return await _dbContext.Properties.Include(x => x.Units).ToListAsync();
+            return await _dbContext.Properties.Include(x => x.Units).Include(f => f.IndoorFeatures).Include(f => f.OutdoorFeatures).Include(f => f.GeneralFeatures).Include(f => f.PolicyDescriptions).ToListAsync();
         }
 
         public async Task<Property?> GetPropertyByIdAsync(long id)
         {
-            return await _dbContext.Properties.Include(x => x.Units).FirstOrDefaultAsync(x => x.Id == id);
+            return await _dbContext.Properties.Include(x => x.Units).Include(f => f.IndoorFeatures).Include(f => f.OutdoorFeatures).Include(f => f.GeneralFeatures).Include(f => f.PolicyDescriptions).FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<Property?> UpdateAsync(Property property)
@@ -61,31 +80,15 @@ namespace KejaHUnt_PropertiesAPI.Repositories.Implementation
             existingProperty.Name = property.Name;
             existingProperty.Location = property.Location;
             existingProperty.Type = property.Type;
-            existingProperty.DocumentId = property.DocumentId;
-
-            // Hold new units in a temporary list
-            List<Unit> newUnits = new List<Unit>();
-
-            if (property.Units != null && property.Units.Any())
+            if (property.DocumentId != null && property.DocumentId != Guid.Empty)
             {
-                foreach (var incomingUnit in property.Units)
-                {
-                    newUnits.Add(new Unit
-                    {
-                        Price = incomingUnit.Price,
-                        Type = incomingUnit.Type,
-                        Bathrooms = incomingUnit.Bathrooms,
-                        Size = incomingUnit.Size,
-                        NoOfUnits = incomingUnit.NoOfUnits,
-                        DocumentId = incomingUnit.DocumentId,
-                        PropertyId = existingProperty.Id
-                    });
-                }
+                existingProperty.DocumentId = property.DocumentId;
             }
-
-
-            // Add the new units to the existing property
-            existingProperty.Units = newUnits;
+            else
+            {
+                // If the document ID is not provided, keep the existing one
+                existingProperty.DocumentId = existingProperty.DocumentId;
+            }
 
             // Save changes
             await _dbContext.SaveChangesAsync();

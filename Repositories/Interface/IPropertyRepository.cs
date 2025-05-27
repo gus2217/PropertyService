@@ -5,7 +5,7 @@ namespace KejaHUnt_PropertiesAPI.Repositories.Interface
 {
     public interface IPropertyRepository
     {
-        Task<Property> CreatePropertyAsync(Property property);
+        Task<Property> CreatePropertyAsync(Property property, long[] generalFeatureIds, long[] indoorFeaturesIds, long[] outdoorFeaturesIds);
 
         Task<IEnumerable<Property>> GetAllAsync();
 

@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using KejaHUnt_PropertiesAPI.Migrations;
 using KejaHUnt_PropertiesAPI.Models.Domain;
 using KejaHUnt_PropertiesAPI.Models.Dto;
 using KejaHUnt_PropertiesAPI.Repositories.Implementation;
@@ -91,7 +90,7 @@ namespace KejaHUnt_PropertiesAPI.Controllers
                 return NotFound();
             }
 
-            return Ok(_mapper.Map<List<UnitDto>>(unit));
+            return Ok(_mapper.Map<UnitDto>(unit));
         }
 
         // GET: {apibaseurl}/api/Unit/property/{propertyId}
@@ -112,46 +111,67 @@ namespace KejaHUnt_PropertiesAPI.Controllers
         // PUT: {apibaseurl}/api/unit/{id}
         [HttpPut]
         [Route("{id:long}")]
-        public async Task<IActionResult> UpdateUnitById([FromRoute] long id, [FromForm] UpdateUnitJsonDto request)
+        public async Task<IActionResult> UpdateUnits([FromRoute] long id, [FromForm] UpdateUnitJsonDto request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            // 1. Deserialize the unit JSON
-            UpdateUnitRequestDto unitDto;
+            var updatedUnits = new List<UnitDto>();
+
+            // Deserialize the units JSON string into a list of UpdateUnitRequestDto
+            List<UpdateUnitRequestDto> unitDtos;
             try
             {
-                unitDto = JsonConvert.DeserializeObject<UpdateUnitRequestDto>(request.Unit);
+                unitDtos = JsonConvert.DeserializeObject<List<UpdateUnitRequestDto>>(request.Units);
             }
             catch (Exception)
             {
-                return BadRequest("Invalid unit JSON format.");
+                return BadRequest("Invalid units JSON format.");
             }
 
-            // 2. Get existing unit
-            var existingUnit = await _unitRepository.GetUnitByIdAsync(id);
-            if (existingUnit == null)
-                return NotFound($"Unit with ID {id} not found.");
-
-            // 3. Handle image update if a file is included
-            Guid? documentIdToUse = existingUnit.DocumentId;
-            if (request.ImageFile != null)
+            foreach (var unit in unitDtos)
             {
-                documentIdToUse = (documentIdToUse != null && documentIdToUse != Guid.Empty)
-                    ? await _imageRepository.Edit(documentIdToUse.Value, request.ImageFile)
-                    : await _imageRepository.Upload(request.ImageFile);
+                // Map the unit DTO to the domain model
+                var unitDto = _mapper.Map<Unit>(unit);
+                unitDto.Id = id;
+
+                // Handle image update if a file is included
+                Guid? documentIdToUse = unitDto.DocumentId;
+                if (request.ImageFile != null)
+                {
+                    documentIdToUse = (documentIdToUse != null && documentIdToUse != Guid.Empty)
+                        ? await _imageRepository.Edit(documentIdToUse.Value, request.ImageFile)
+                        : await _imageRepository.Upload(request.ImageFile);
+                }
+                unitDto.DocumentId = documentIdToUse;
+
+                // Save to DB
+                await _unitRepository.UpdateAsync(unitDto);
+
+                // Add the updated unit to the response list
+                updatedUnits.Add(_mapper.Map<UnitDto>(unitDto));
             }
 
-            // 4. Update unit fields
-            existingUnit = _mapper.Map<UpdateUnitRequestDto, Unit>(unitDto, existingUnit);
-            existingUnit.DocumentId = documentIdToUse;
-            existingUnit.Id = id;
-
-            // 5. Save to DB
-            await _unitRepository.UpdateAsync(existingUnit);
-
-            return Ok(_mapper.Map<UnitDto>(existingUnit));
+            return Ok(_mapper.Map<List<UnitDto>>(updatedUnits)); ;
         }
+
+        // PUT: api/Units/status
+        [HttpPut]
+        [Route("status")]
+        public async Task<IActionResult> UpdateUnitStatus([FromBody] UnitStatusDto request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var updatedUnit = await _unitRepository.UpdateUnitStatusAsync(request);
+
+            if (updatedUnit == null)
+                return NotFound($"No unit found with ID {request.UnitId}");
+
+            return Ok(_mapper.Map<UnitDto>(updatedUnit));
+        }
+
+
 
         // DELETE: {apibaseurl}/api/unit/{id}
         [HttpDelete]

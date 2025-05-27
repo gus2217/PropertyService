@@ -2,7 +2,7 @@
 {
     public class UpdateUnitJsonDto
     {
-            public string Unit { get; set; } // JSON string representing UpdateUnitRequestDto
+            public string Units { get; set; } // JSON string representing UpdateUnitRequestDto
             public IFormFile? ImageFile { get; set; }
     }
 }

@@ -3,8 +3,21 @@ using KejaHUnt_PropertiesAPI.Repositories.Implementation;
 using KejaHUnt_PropertiesAPI.Repositories.Interface;
 using KejaHUnt_PropertiesAPI.Utility;
 using Microsoft.EntityFrameworkCore;
+using Serilog.Events;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var logPath = builder.Configuration.GetValue<string>("LogPath");
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.File(
+        path: logPath ?? "C:\\Logs",  // Default fallback path if LogPath is missing
+        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}",
+        rollingInterval: RollingInterval.Day,
+        restrictedToMinimumLevel: LogEventLevel.Information
+    ).CreateLogger();
+builder.Host.UseSerilog();
+
 
 // Add services to the container.
 builder.Services.AddDbContext<ApplicationDbContext>(options
@@ -12,6 +25,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options
 builder.Services.AddScoped<IImageRepository, ImageRepository>();
 builder.Services.AddScoped<IPropertyRepository, PropertyRepository>();
 builder.Services.AddScoped<IUnitRepository, UnitRepository>();
+builder.Services.AddScoped<IFeatureRepository, FeatureRepository>();
 builder.Services.AddHttpClient(); 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAutoMapper(typeof(MappingProfile));

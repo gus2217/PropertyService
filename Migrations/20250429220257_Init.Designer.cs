@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KejaHUnt_PropertiesAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250429071410_Init")]
+    [Migration("20250429220257_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -67,7 +67,11 @@ namespace KejaHUnt_PropertiesAPI.Migrations
                     b.Property<Guid?>("DocumentId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("NoOfUnits")
+                    b.Property<string>("DoorNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Floor")
                         .HasColumnType("int");
 
                     b.Property<decimal>("Price")
@@ -79,6 +83,10 @@ namespace KejaHUnt_PropertiesAPI.Migrations
 
                     b.Property<double>("Size")
                         .HasColumnType("float");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Type")
                         .IsRequired()

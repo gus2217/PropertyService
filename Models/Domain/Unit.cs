@@ -10,7 +10,9 @@ namespace KejaHUnt_PropertiesAPI.Models.Domain
         public string Type { get; set; }
         public int Bathrooms { get; set; }
         public double Size { get; set; }
-        public int NoOfUnits { get; set; }
+        public int Floor { get; set; }
+        public string DoorNumber { get; set; }
+        public string Status { get; set; }
         public Guid? DocumentId { get; set; }
         public long PropertyId { get; set; }
         public Property Property { get; set; }

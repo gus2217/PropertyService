@@ -10,24 +10,36 @@ namespace KejaHUnt_PropertiesAPI.Utility
     {
         public MappingProfile()
         {
+            
+
             // Property -> CreatePropertyRequestDto
             CreateMap<Property, CreatePropertyRequestDto>()
-                .ForMember(dest => dest.Units, opt => opt.MapFrom(src => JsonConvert.SerializeObject(src.Units)));
+                .ForMember(dest => dest.GeneralFeatures, opt => opt.MapFrom(src => src.GeneralFeatures.Select(gf => gf.Id)))
+                .ForMember(dest => dest.OutdoorFeatures, opt => opt.MapFrom(src => src.OutdoorFeatures.Select(gf => gf.Id)))
+                .ForMember(dest => dest.IndoorFeatures, opt => opt.MapFrom(src => src.IndoorFeatures.Select(gf => gf.Id)))
+                .ReverseMap()
+                .ForMember(dest => dest.GeneralFeatures, opt => opt.Ignore()) // Manual mapping later
+                .ForMember(dest => dest.OutdoorFeatures, opt => opt.Ignore()) // Manual mapping later
+                .ForMember(dest => dest.IndoorFeatures, opt => opt.Ignore()); // Manual mapping later
 
-            // CreatePropertyRequestDto -> Property
-            CreateMap<CreatePropertyRequestDto, Property>()
-                .ForMember(dest => dest.Units, opt => opt.MapFrom(src =>
-                    string.IsNullOrEmpty(src.Units)
-                        ? new List<Unit>()
-                        : JsonConvert.DeserializeObject<List<Unit>>(src.Units)));
 
             CreateMap<Unit, CreateUnitRequestDto>().ReverseMap();
+
+            CreateMap<UpdatePropertyRequestDto, Property>();
 
             CreateMap<Unit, UnitDto>().ReverseMap();
             
             CreateMap<UpdateUnitRequestDto, Unit>().ReverseMap();
 
             CreateMap<Property, PropertyDto>().ReverseMap();
+
+            CreateMap<GeneralFeatures, FeaturesDto>().ReverseMap();
+            CreateMap<IndoorFeatures, FeaturesDto>().ReverseMap();
+            CreateMap<OutDoorFeatures, FeaturesDto>().ReverseMap();
+            CreateMap<CreatePolicyDto, PolicyDescription>().ReverseMap();
+            CreateMap<Policy, PolicyDto>().ReverseMap();
+            CreateMap<PolicyDescription, PolicydescriptionDto>().ReverseMap();
+
         }
     }
 }

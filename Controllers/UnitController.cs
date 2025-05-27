@@ -137,11 +137,11 @@ namespace KejaHUnt_PropertiesAPI.Controllers
 
                 // Handle image update if a file is included
                 Guid? documentIdToUse = unitDto.DocumentId;
-                if (unit.ImageFile != null)
+                if (request.ImageFile != null)
                 {
                     documentIdToUse = (documentIdToUse != null && documentIdToUse != Guid.Empty)
-                        ? await _imageRepository.Edit(documentIdToUse.Value, unit.ImageFile)
-                        : await _imageRepository.Upload(unit.ImageFile);
+                        ? await _imageRepository.Edit(documentIdToUse.Value, request.ImageFile)
+                        : await _imageRepository.Upload(request.ImageFile);
                 }
                 unitDto.DocumentId = documentIdToUse;
 

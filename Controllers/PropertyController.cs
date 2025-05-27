@@ -20,36 +20,39 @@ namespace KejaHUnt_PropertiesAPI.Controllers
         private readonly IMapper _mapper;
         private readonly IImageRepository _imageRepository;
         private readonly IUnitRepository _unitRepository;
+        private readonly ILogger<PropertyController> _logger;
 
-        public PropertyController(IPropertyRepository propertyRepository, IMapper mapper, IImageRepository imageRepository, IUnitRepository unitRepository)
+        public PropertyController(IPropertyRepository propertyRepository, IMapper mapper, IImageRepository imageRepository, IUnitRepository unitRepository, ILogger<PropertyController> logger)
         {
             _propertyRepository = propertyRepository;
             _mapper = mapper;
             _imageRepository = imageRepository;
             _unitRepository = unitRepository;
+            _logger = logger;
         }
 
         // POST: {apibaseurl}/api/property
         [HttpPost]
         public async Task<IActionResult> CreateProperty([FromForm] CreatePropertyRequestDto request)
         {
+            _logger.LogInformation($"Creation of property {request.Name} started");
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             // Upload image and get DocumentId
             Guid documentId = await _imageRepository.Upload(request.ImageFile);
 
-            // Map the main property (excluding units)
+            // Map base property (excluding GeneralFeatures)
             var property = _mapper.Map<Property>(request);
             property.DocumentId = documentId;
             property.Units = new List<Unit>();
 
-            // Save to database
-            await _propertyRepository.CreatePropertyAsync(property);
+            // Use feature IDs from request to load full GeneralFeatures in the repo
+            await _propertyRepository.CreatePropertyAsync(property, request.GeneralFeatures, request.IndoorFeatures, request.OutdoorFeatures);
 
-            // Map back to DTO for response
             return Ok(_mapper.Map<PropertyDto>(property));
         }
+
 
         [HttpGet]
         public async Task<IActionResult> GetAllAsync()

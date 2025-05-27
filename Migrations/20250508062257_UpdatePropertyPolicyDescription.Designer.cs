@@ -4,6 +4,7 @@ using KejaHUnt_PropertiesAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KejaHUnt_PropertiesAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250508062257_UpdatePropertyPolicyDescription")]
+    partial class UpdatePropertyPolicyDescription
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -39,13 +42,13 @@ namespace KejaHUnt_PropertiesAPI.Migrations
 
             modelBuilder.Entity("IndoorFeaturesProperty", b =>
                 {
-                    b.Property<long>("IndoorFeaturesId")
+                    b.Property<long>("IdoorFeaturesId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("PropertiesId")
                         .HasColumnType("bigint");
 
-                    b.HasKey("IndoorFeaturesId", "PropertiesId");
+                    b.HasKey("IdoorFeaturesId", "PropertiesId");
 
                     b.HasIndex("PropertiesId");
 
@@ -259,7 +262,7 @@ namespace KejaHUnt_PropertiesAPI.Migrations
                 {
                     b.HasOne("KejaHUnt_PropertiesAPI.Models.Domain.IndoorFeatures", null)
                         .WithMany()
-                        .HasForeignKey("IndoorFeaturesId")
+                        .HasForeignKey("IdoorFeaturesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

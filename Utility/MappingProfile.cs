@@ -10,11 +10,17 @@ namespace KejaHUnt_PropertiesAPI.Utility
     {
         public MappingProfile()
         {
-            // Property -> CreatePropertyRequestDto
-            CreateMap<Property, CreatePropertyRequestDto>().ReverseMap();
+            
 
-            // CreatePropertyRequestDto -> Property
-            CreateMap<CreatePropertyRequestDto, Property>().ReverseMap();
+            // Property -> CreatePropertyRequestDto
+            CreateMap<Property, CreatePropertyRequestDto>()
+                .ForMember(dest => dest.GeneralFeatures, opt => opt.MapFrom(src => src.GeneralFeatures.Select(gf => gf.Id)))
+                .ForMember(dest => dest.OutdoorFeatures, opt => opt.MapFrom(src => src.OutdoorFeatures.Select(gf => gf.Id)))
+                .ForMember(dest => dest.IndoorFeatures, opt => opt.MapFrom(src => src.IndoorFeatures.Select(gf => gf.Id)))
+                .ReverseMap()
+                .ForMember(dest => dest.GeneralFeatures, opt => opt.Ignore()) // Manual mapping later
+                .ForMember(dest => dest.OutdoorFeatures, opt => opt.Ignore()) // Manual mapping later
+                .ForMember(dest => dest.IndoorFeatures, opt => opt.Ignore()); // Manual mapping later
 
 
             CreateMap<Unit, CreateUnitRequestDto>().ReverseMap();
@@ -26,6 +32,14 @@ namespace KejaHUnt_PropertiesAPI.Utility
             CreateMap<UpdateUnitRequestDto, Unit>().ReverseMap();
 
             CreateMap<Property, PropertyDto>().ReverseMap();
+
+            CreateMap<GeneralFeatures, FeaturesDto>().ReverseMap();
+            CreateMap<IndoorFeatures, FeaturesDto>().ReverseMap();
+            CreateMap<OutDoorFeatures, FeaturesDto>().ReverseMap();
+            CreateMap<CreatePolicyDto, PolicyDescription>().ReverseMap();
+            CreateMap<Policy, PolicyDto>().ReverseMap();
+            CreateMap<PolicyDescription, PolicydescriptionDto>().ReverseMap();
+
         }
     }
 }

@@ -63,7 +63,7 @@ namespace KejaHUnt_PropertiesAPI.Repositories.Implementation
             existingUnit.DoorNumber = unit.DoorNumber;
             existingUnit.Status = unit.Status;
             existingUnit.PropertyId = unit.PropertyId;
-            if(unit.DocumentId != null && unit.DocumentId != Guid.Empty)
+            if (unit.DocumentId != null && unit.DocumentId != Guid.Empty)
             {
                 existingUnit.DocumentId = unit.DocumentId;
             }
@@ -96,8 +96,7 @@ namespace KejaHUnt_PropertiesAPI.Repositories.Implementation
             }
 
             // Block if trying to book a unit that is already Booked or Reserved
-            if ((request.Status == "Booked" || request.Status == "Reserved") &&
-                (existingUnit.Status == "Booked" || existingUnit.Status == "Reserved"))
+            if (existingUnit.Status == "Booked" ||( request.Status == "Reserved" && existingUnit.Status == "Reserved"))
             {
                 // You can also throw a custom exception here if needed
                 return null;

@@ -1,0 +1,110 @@
+name: .NET Build and Deploy
+
+on:
+  workflow_dispatch  # Manual trigger via GitHub UI
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+        
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build application
+      run: dotnet build --no-restore --configuration Release
+      
+    - name: Run tests
+      run: dotnet test --no-build --configuration Release --verbosity normal
+      
+    - name: Publish application
+      run: dotnet publish --no-build --configuration Release --output ./publish
+      
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: published-app
+        path: ./publish/
+
+  # Deploy directly to EC2 (runs only on main branch)
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: published-app
+        path: ./publish/
+        
+    - name: Create deployment package
+      run: |
+        cd ./publish
+        tar -czf ../app-deployment.tar.gz *
+        
+    - name: Copy files to EC2
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_KEY }}
+        port: 22
+        source: "app-deployment.tar.gz"
+        target: "/tmp/"
+        
+    - name: Deploy and restart service on EC2
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_KEY }}
+        port: 22
+        script: |
+          # Stop the application service
+          sudo systemctl stop your-dotnet-app || true
+          
+          # Backup current version (optional)
+          sudo mkdir -p /var/www/your-app/backup
+          sudo cp -r /var/www/your-app/current/* /var/www/your-app/backup/ 2>/dev/null || true
+          
+          # Deploy new version
+          cd /var/www/your-app
+          sudo rm -rf ./current/*
+          sudo tar -xzf /tmp/app-deployment.tar.gz -C ./current/
+          sudo chown -R www-data:www-data ./current/
+          sudo chmod +x ./current/YourAppName
+          
+          # Clean up temp file
+          rm -f /tmp/app-deployment.tar.gz
+          
+          # Start the application service
+          sudo systemctl start your-dotnet-app
+          sudo systemctl enable your-dotnet-app
+          
+          # Wait and verify deployment
+          echo "Waiting for application to start..."
+          sleep 15
+          
+          # Check if service is running
+          if sudo systemctl is-active --quiet your-dotnet-app; then
+            echo "✅ Service is running"
+          else
+            echo "❌ Service failed to start"
+            sudo journalctl -u your-dotnet-app --no-pager -n 20
+            exit 1
+          fi
+          
+          # Optional: Health check (if you have a health endpoint)
+          # curl -f http://localhost:5000/health || exit 1
+          
+          echo "🚀 Deployment completed successfully!"

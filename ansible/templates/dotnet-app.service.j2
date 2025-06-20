@@ -6,7 +6,7 @@ After=network.target
 [Service]
 Type=notify
 WorkingDirectory={{ app_directory }}/current
-ExecStart={{ app_directory }}/current/{{ app_executable | default(app_name) }}
+ExecStart=/usr/bin/dotnet {{ app_directory }}/current/{{ app_executable | default(app_name) }}.dll
 Restart=always
 RestartSec=10
 User={{ app_user }}

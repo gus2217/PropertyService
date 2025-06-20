@@ -3,7 +3,7 @@
   hosts: ec2_servers
   become: yes
   vars:
-    app_name: "your-dotnet-app"
+    app_name: "PropertyService"
     app_user: "www-data"
     app_group: "www-data"
     app_directory: "/var/www/your-app"
@@ -113,38 +113,6 @@
         daemon_reload: yes
       ignore_errors: yes
 
-    - name: Install nginx (optional reverse proxy)
-      apt:
-        name: nginx
-        state: present
-      when: install_nginx | default(false)
-
-    - name: Configure nginx for the application
-      template:
-        src: nginx-site.j2
-        dest: "/etc/nginx/sites-available/{{ app_name }}"
-        mode: '0644'
-      when: install_nginx | default(false)
-      notify:
-        - reload nginx
-
-    - name: Enable nginx site
-      file:
-        src: "/etc/nginx/sites-available/{{ app_name }}"
-        dest: "/etc/nginx/sites-enabled/{{ app_name }}"
-        state: link
-      when: install_nginx | default(false)
-      notify:
-        - reload nginx
-
-    - name: Remove default nginx site
-      file:
-        path: /etc/nginx/sites-enabled/default
-        state: absent
-      when: install_nginx | default(false)
-      notify:
-        - reload nginx
-
   handlers:
     - name: reload systemd
       systemd:
@@ -155,8 +123,3 @@
         name: "{{ app_name }}"
         state: restarted
       ignore_errors: yes
-
-    - name: reload nginx
-      systemd:
-        name: nginx
-        state: reloaded

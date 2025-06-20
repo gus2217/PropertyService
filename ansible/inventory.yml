@@ -5,5 +5,5 @@ all:
       hosts:
         your-ec2-server:
           ansible_host: "{{ ec2_public_ip }}"
-          ansible_user: ubuntu  # or ec2-user for Amazon Linux
-          ansible_ssh_private_key_file: ~/.ssh/your-key.pem
+          ansible_user: "{{ ec2_user }}" 
+          ansible_ssh_private_key_file: /tmp/ec2-key.pem

@@ -37,6 +37,7 @@ jobs:
 
   # Job 2: Build and deploy application (runs on every push)
   deploy-application:
+    needs: setup-infrastructure
     runs-on: ubuntu-latest
     # Remove the 'needs' line if you want this to run independently
     # needs: setup-infrastructure

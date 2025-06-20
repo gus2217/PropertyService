@@ -1,0 +1,22 @@
+# templates/dotnet-app.service.j2
+[Unit]
+Description={{ app_name | title }} .NET Application
+After=network.target
+
+[Service]
+Type=notify
+WorkingDirectory={{ app_directory }}/current
+ExecStart={{ app_directory }}/current/{{ app_executable | default(app_name) }}
+Restart=always
+RestartSec=10
+User={{ app_user }}
+Group={{ app_group }}
+Environment=ASPNETCORE_ENVIRONMENT={{ aspnet_environment | default('Production') }}
+Environment=ASPNETCORE_URLS=http://localhost:{{ app_port | default('5000') }}
+EnvironmentFile={{ app_directory }}/app.env
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier={{ app_name }}
+
+[Install]
+WantedBy=multi-user.target

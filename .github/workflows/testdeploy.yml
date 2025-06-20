@@ -28,7 +28,7 @@ jobs:
       - name: Run Ansible playbook
         run: |
           cd ansible
-          ansible-playbook -i inventory.yml playbook.yml \
+          ansible-playbook -i inventory.yml ec2-setup-playbook.yml \
             --private-key /tmp/ec2-key.pem \
              --extra-vars "ec2_public_ip=${{ secrets.EC2_HOST }} ec2_user=${{ secrets.EC2_USER }}"
       

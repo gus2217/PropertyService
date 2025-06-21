@@ -12,7 +12,7 @@ RestartSec=10
 User={{ app_user }}
 Group={{ app_group }}
 Environment=ASPNETCORE_ENVIRONMENT={{ aspnet_environment | default('Production') }}
-Environment=ASPNETCORE_URLS=http://localhost:{{ app_port | default('5000') }}
+Environment=ASPNETCORE_URLS=http://0.0.0.0:{{ app_port | default('5000') }}
 EnvironmentFile={{ app_directory }}/app.env
 StandardOutput=journal
 StandardError=journal

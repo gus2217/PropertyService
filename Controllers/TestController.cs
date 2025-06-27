@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 
-namespace YourProjectName.Controllers  // Change "YourProjectName" to your actual project name
+namespace KejaHUnt_PropertiesAPI.Controllers  
 {
     [ApiController]
     [Route("api/[controller]")]

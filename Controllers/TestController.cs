@@ -28,7 +28,7 @@ namespace KejaHUnt_PropertiesAPI.Controllers
 
                 // Environment check
                 var environment = _configuration["ASPNETCORE_ENVIRONMENT"];
-                var isDevelopment = _configuration.GetValue<bool>("ASPNETCORE_ENVIRONMENT");
+                var isDevelopment = environment == "Development";
 
                 var debugInfo = new
                 {

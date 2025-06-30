@@ -21,27 +21,30 @@ namespace KejaHUnt_PropertiesAPI.Controllers
         {
             try
             {
-                var connectionString = _configuration.GetConnectionString("DefaultConnection");
+                // Multiple ways to get the connection string
+                var method1 = _configuration.GetConnectionString("DefaultConnection");
+                var method2 = _configuration["ConnectionStrings:DefaultConnection"];
+                var method3 = _connectionString; // from constructor
 
-                if (string.IsNullOrEmpty(connectionString))
+                // Environment check
+                var environment = _configuration["ASPNETCORE_ENVIRONMENT"];
+                var isDevelopment = _configuration.GetValue<bool>("ASPNETCORE_ENVIRONMENT");
+
+                var debugInfo = new
                 {
-                    return BadRequest("Connection string is null or empty");
-                }
+                    Method1_GetConnectionString = method1 ?? "NULL",
+                    Method2_DirectAccess = method2 ?? "NULL",
+                    Method3_Constructor = method3 ?? "NULL",
+                    Environment = environment ?? "NULL",
+                    ConnectionStringLength = method1?.Length ?? 0,
+                    FirstChars = method1?.Length > 0 ? method1.Substring(0, Math.Min(20, method1.Length)) : "EMPTY"
+                };
 
-                // Test the actual database connection
-                using var connection = new SqlConnection(connectionString);
-                await connection.OpenAsync();
-
-                // If we get here, connection worked
-                return Ok("Database connection successful!");
-            }
-            catch (SqlException sqlEx)
-            {
-                return BadRequest($"SQL Error: {sqlEx.Message} | Error Number: {sqlEx.Number}");
+                return Ok(debugInfo);
             }
             catch (Exception ex)
             {
-                return BadRequest($"Connection Error: {ex.Message}");
+                return BadRequest($"Debug Error: {ex.Message}");
             }
         }
     }

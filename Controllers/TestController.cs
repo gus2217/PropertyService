@@ -21,34 +21,27 @@ namespace KejaHUnt_PropertiesAPI.Controllers
         {
             try
             {
-                // Debug all configuration sources
-                var allConfig = new Dictionary<string, string>();
-                foreach (var item in _configuration.AsEnumerable())
-                {
-                    allConfig[item.Key] = item.Value;
-                }
-
                 var connectionString = _configuration.GetConnectionString("DefaultConnection");
 
                 if (string.IsNullOrEmpty(connectionString))
                 {
-                    return BadRequest($"Connection string is null. Available keys: {string.Join(", ", allConfig.Keys.Where(k => k.Contains("Connection")))}");
+                    return BadRequest("Connection string is null or empty");
                 }
 
-                // Show actual connection string details (safely)
-                var parts = connectionString.Split(';');
-                var safeParts = parts.Select(p => p.Contains("Password") ? "Password=***" : p);
+                // Test the actual database connection
+                using var connection = new SqlConnection(connectionString);
+                await connection.OpenAsync();
 
-                return Ok($"Connection string parts: {string.Join("; ", safeParts)}");
-
-                // Comment out actual connection test for now
-                // using var connection = new SqlConnection(connectionString);
-                // await connection.OpenAsync();
-                // return Ok("Database connection successful!");
+                // If we get here, connection worked
+                return Ok("Database connection successful!");
+            }
+            catch (SqlException sqlEx)
+            {
+                return BadRequest($"SQL Error: {sqlEx.Message} | Error Number: {sqlEx.Number}");
             }
             catch (Exception ex)
             {
-                return BadRequest($"Error: {ex.Message} | StackTrace: {ex.StackTrace}");
+                return BadRequest($"Connection Error: {ex.Message}");
             }
         }
     }

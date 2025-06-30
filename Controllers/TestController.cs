@@ -21,24 +21,19 @@ namespace KejaHUnt_PropertiesAPI.Controllers  // Project namespace
         {
             try
             {
-                // Step 1: Check if connection string exists
                 if (string.IsNullOrEmpty(_connectionString))
                 {
-                    return BadRequest("Connection string 'DefaultConnection' is null or empty");
+                    return BadRequest("Connection string is null or empty");
                 }
 
-                // Step 2: Show the connection string (first 60 characters for security)
-                var preview = _connectionString.Length > 60 ? 
-                    _connectionString.Substring(0, 60) + "..." : 
-                    _connectionString;
-                
-                return Ok($"Connection string found: {preview}");
-
-                // We'll test the actual connection in the next step
+                // Now test the actual database connection
+                using var connection = new SqlConnection(_connectionString);
+                await connection.OpenAsync();
+                return Ok("Database connection successful!");
             }
             catch (Exception ex)
             {
-                return BadRequest($"Error: {ex.Message}");
+                return BadRequest($"Database connection failed: {ex.Message}");
             }
         }
     }

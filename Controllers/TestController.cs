@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 
-namespace KejaHUnt_PropertiesAPI.Controllers  // Project namespace
+namespace KejaHUnt_PropertiesAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -21,19 +21,34 @@ namespace KejaHUnt_PropertiesAPI.Controllers  // Project namespace
         {
             try
             {
-                if (string.IsNullOrEmpty(_connectionString))
+                // Debug all configuration sources
+                var allConfig = new Dictionary<string, string>();
+                foreach (var item in _configuration.AsEnumerable())
                 {
-                    return BadRequest("Connection string is null or empty");
+                    allConfig[item.Key] = item.Value;
                 }
 
-                // Now test the actual database connection
-                using var connection = new SqlConnection(_connectionString);
-                await connection.OpenAsync();
-                return Ok("Database connection successful!");
+                var connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+                if (string.IsNullOrEmpty(connectionString))
+                {
+                    return BadRequest($"Connection string is null. Available keys: {string.Join(", ", allConfig.Keys.Where(k => k.Contains("Connection")))}");
+                }
+
+                // Show actual connection string details (safely)
+                var parts = connectionString.Split(';');
+                var safeParts = parts.Select(p => p.Contains("Password") ? "Password=***" : p);
+
+                return Ok($"Connection string parts: {string.Join("; ", safeParts)}");
+
+                // Comment out actual connection test for now
+                // using var connection = new SqlConnection(connectionString);
+                // await connection.OpenAsync();
+                // return Ok("Database connection successful!");
             }
             catch (Exception ex)
             {
-                return BadRequest($"Database connection failed: {ex.Message}");
+                return BadRequest($"Error: {ex.Message} | StackTrace: {ex.StackTrace}");
             }
         }
     }

@@ -10,5 +10,5 @@ aspnet_environment: "Production"
 
 # Environment variables for your app
 app_env_vars:
-  ConnectionStrings__DefaultConnection: "Server=0.tcp.in.ngrok.io,10732;Database=KejaHUnTdb;User Id=sa;Password=Chepsom-80;TrustServerCertificate=True"
+  ConnectionStrings__DefaultConnection: "Server=0.tcp.in.ngrok.io,16259;Database=KejaHUnTdb;User Id=sa;Password=Chepsom-80;TrustServerCertificate=True"
   # Add more as needed

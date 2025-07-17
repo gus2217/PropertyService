@@ -76,5 +76,18 @@ namespace KejaHUnt_PropertiesAPI.Repositories.Implementation
                 .Include(p => p.PolicyDescriptions)
                 .FirstOrDefaultAsync(p => p.Id == id));
         }
+
+        public async Task<PolicydescriptionDto?> UpdatePolicyDescriptionAsync(UpdatePolicyDescriptionDto request)
+        {
+            var existingDescription = await _dbContext.PolicyDescriptions.FirstOrDefaultAsync(pd => pd.Id == request.Id);
+            if (existingDescription == null)
+            {
+                return null;
+            }
+            existingDescription.Name = request.Name;
+            _dbContext.PolicyDescriptions.Update(existingDescription);
+            await _dbContext.SaveChangesAsync();
+            return _mapper.Map<PolicydescriptionDto>(existingDescription);
+        }
     }
 }

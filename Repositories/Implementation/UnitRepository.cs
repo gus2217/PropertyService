@@ -92,18 +92,33 @@ namespace KejaHUnt_PropertiesAPI.Repositories.Implementation
 
             if (existingUnit == null)
             {
-                return null;
+                throw new InvalidOperationException("Unit not found.");
             }
 
-            // Block if trying to book a unit that is already Booked or Reserved
-            if (existingUnit.Status == "Booked" ||( request.Status == "Reserved" && existingUnit.Status == "Reserved"))
+            var currentStatus = existingUnit.Status;
+            var newStatus = request.Status;
+
+            // Valid transitions:
+            if (currentStatus == "Available" &&
+                (newStatus == "Reserved" || newStatus == "Booked" || newStatus == "Paying"))
             {
-                // You can also throw a custom exception here if needed
-                return null;
+                existingUnit.Status = newStatus;
             }
-
-            // Update the Status string directly
-            existingUnit.Status = request.Status;
+            else if (currentStatus == "Reserved" &&
+                     (newStatus == "Booked" || newStatus == "Paying"))
+            {
+                existingUnit.Status = newStatus;
+            }
+            else if (currentStatus == "Paying" &&
+                     (newStatus == "Booked" || newStatus == "Reserved" || newStatus == "Available" || newStatus == "Paying"))
+            {
+                existingUnit.Status = newStatus;
+            }
+            else
+            {
+                throw new InvalidOperationException(
+                    $"Cannot change unit status from '{currentStatus}' to '{newStatus}'.");
+            }
 
             await _dbContext.SaveChangesAsync();
 

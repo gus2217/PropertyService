@@ -9,6 +9,18 @@ namespace KejaHUnt_PropertiesAPI.Models.Dto
         public string Name { get; set; }
         public string Location { get; set; }
         public string Type { get; set; }
+        public string Description { get; set; }
+        [FromForm(Name = "generalFeatures")]
+        public List<long?> GeneralFeatures { get; set; } = new();
+
+        [FromForm(Name = "indoorFeatures")]
+        public List<long?> IndoorFeatures { get; set; } = new();
+
+        [FromForm(Name = "outdoorFeatures")]
+        public List<long?> OutDoorFeatures { get; set; } = new();
+
+        [FromForm(Name = "policyDescriptions")]
+        public string? PolicyDescriptions { get; set; } // JSON stringified array
         public Guid? DocumentId { get; set; }
         [FromForm(Name = "imageFile")]
         public IFormFile? ImageFile { get; set; } // Attach the file here
@@ -16,3 +28,4 @@ namespace KejaHUnt_PropertiesAPI.Models.Dto
         public string? Units { get; set; }
     }
 }
+

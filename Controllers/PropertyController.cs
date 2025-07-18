@@ -52,7 +52,7 @@ namespace KejaHUnt_PropertiesAPI.Controllers
             return Ok(_mapper.Map<PropertyDto>(property));
         }
 
-
+/*
         [HttpGet]
         public async Task<IActionResult> GetAllAsync()
         {
@@ -60,7 +60,24 @@ namespace KejaHUnt_PropertiesAPI.Controllers
 
             return Ok(_mapper.Map<List<PropertyDto>>(properties));
         }
+*/
+//Added for debugging ***********************************************************************
+        [HttpGet]
+        public async Task<IActionResult> GetAllAsync()
+        {
+            try
+            {
+                var properties = await _propertyRepository.GetAllAsync();
+                return Ok(_mapper.Map<List<PropertyDto>>(properties));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while retrieving all properties.");
+                return StatusCode(500, new { error = ex.Message, details = ex.StackTrace });
+            }
+        }
 
+       
         [HttpGet]
         [Route("{id:long}")]
         public async Task<IActionResult> GetPropertyByIdAsync([FromRoute] long id)

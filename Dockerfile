@@ -2,6 +2,12 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 COPY . ./
+
+# Install EF CLI tools
+RUN dotnet tool install --global dotnet-ef \
+ && export PATH="$PATH:/root/.dotnet/tools" \
+ && dotnet ef --version
+
 RUN dotnet publish -c Release -o /out
 
 # Runtime stage

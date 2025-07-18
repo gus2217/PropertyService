@@ -4,10 +4,10 @@ WORKDIR /app
 COPY . ./
 
 # Install EF CLI tools
-RUN dotnet tool install --global dotnet-ef \
- && export PATH="$PATH:/root/.dotnet/tools" \
- && dotnet ef --version
+RUN dotnet tool install --global dotnet-ef
+ENV PATH="${PATH}:/root/.dotnet/tools"
 
+RUN dotnet ef --version
 RUN dotnet publish -c Release -o /out
 
 # Runtime stage

@@ -1,11 +1,7 @@
-﻿using System.Threading.Tasks;
-using KejaHUnt_PropertiesAPI.Data;
-using KejaHUnt_PropertiesAPI.Models.Domain;
+﻿using KejaHUnt_PropertiesAPI.Data;
 using KejaHUnt_PropertiesAPI.Models.Dto;
 using KejaHUnt_PropertiesAPI.Repositories.Interface;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace KejaHUnt_PropertiesAPI.Controllers
 {
@@ -14,12 +10,10 @@ namespace KejaHUnt_PropertiesAPI.Controllers
     public class GeneralFeaturesController : ControllerBase
     {
         private readonly IFeatureRepository _featureRepository;
-        private readonly ApplicationDbContext _applicationDbContext;
 
         public GeneralFeaturesController(IFeatureRepository featureRepository,ApplicationDbContext applicationDbContext)
         {
             _featureRepository = featureRepository;
-            _applicationDbContext = applicationDbContext;
         }
 
         [HttpPost]
@@ -62,6 +56,18 @@ namespace KejaHUnt_PropertiesAPI.Controllers
         public async Task<IActionResult> GetPolicyById(long id)
         {
            return Ok(await _featureRepository.GetPolicyByIdAsync(id));
+        }
+
+        [HttpPut]
+        [Route("description")]
+        public async Task<IActionResult> UpdatePolicyDescription([FromBody] UpdatePolicyDescriptionDto request)
+        {
+            var updatedDescription = await _featureRepository.UpdatePolicyDescriptionAsync(request);
+            if (updatedDescription == null)
+            {
+                return NotFound();
+            }
+            return Ok(updatedDescription);
         }
     }
 }

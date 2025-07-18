@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Azure.Core;
 using KejaHUnt_PropertiesAPI.Models.Domain;
 using KejaHUnt_PropertiesAPI.Models.Dto;
 using KejaHUnt_PropertiesAPI.Repositories.Implementation;
@@ -100,19 +99,8 @@ namespace KejaHUnt_PropertiesAPI.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            // Map the request DTO into a new Property object
-            var updatedProperty = _mapper.Map<Property>(request);
-            updatedProperty.Id = id; // Ensure ID is set so EF can track the correct entity
-            // Upload/edit property image if provided
-            if (request.ImageFile != null)
-            {
-                updatedProperty.DocumentId = (request.DocumentId != null && request.DocumentId != Guid.Empty)
-                    ? await _imageRepository.Edit(request.DocumentId.Value, request.ImageFile)
-                    : await _imageRepository.Upload(request.ImageFile);
-            }
-
             // Save property updates
-            await _propertyRepository.UpdateAsync(updatedProperty);
+            var updatedProperty = await _propertyRepository.UpdateAsync(id, request);
 
             return Ok(_mapper.Map<PropertyDto>(updatedProperty));
         }

@@ -13,6 +13,7 @@ namespace KejaHUnt_PropertiesAPI.Repositories.Interface
         Task<List<FeaturesDto>> GetAllOutdoorFeaturesAsync();
         Task<List<PolicyDto>> GetAllPoliciessAsync();
         Task<PolicydescriptionDto> CreatePolicyDescriptionAsync(CreatePolicyDto request);
+        Task<PolicydescriptionDto?> UpdatePolicyDescriptionAsync(UpdatePolicyDescriptionDto request);
         Task<PolicyDto?> GetPolicyByIdAsync(long id);
     }
 }

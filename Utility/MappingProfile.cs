@@ -2,7 +2,6 @@
 using KejaHUnt_PropertiesAPI.Models.Domain;
 using KejaHUnt_PropertiesAPI.Models.Dto;
 using Newtonsoft.Json;
-using static Azure.Core.HttpHeader;
 
 namespace KejaHUnt_PropertiesAPI.Utility
 {
@@ -10,7 +9,7 @@ namespace KejaHUnt_PropertiesAPI.Utility
     {
         public MappingProfile()
         {
-            
+
 
             // Property -> CreatePropertyRequestDto
             CreateMap<Property, CreatePropertyRequestDto>()
@@ -25,10 +24,20 @@ namespace KejaHUnt_PropertiesAPI.Utility
 
             CreateMap<Unit, CreateUnitRequestDto>().ReverseMap();
 
-            CreateMap<UpdatePropertyRequestDto, Property>();
+            CreateMap<Property, UpdatePropertyRequestDto>()
+                 .ForMember(dest => dest.GeneralFeatures, opt => opt.MapFrom(src => src.GeneralFeatures.Select(gf => gf.Id)))
+                .ForMember(dest => dest.OutDoorFeatures, opt => opt.MapFrom(src => src.OutdoorFeatures.Select(gf => gf.Id)))
+                .ForMember(dest => dest.IndoorFeatures, opt => opt.MapFrom(src => src.IndoorFeatures.Select(gf => gf.Id)))
+                .ReverseMap()
+                .ForMember(dest => dest.GeneralFeatures, opt => opt.Ignore()) // Manual mapping later
+                .ForMember(dest => dest.OutdoorFeatures, opt => opt.Ignore()) // Manual mapping later
+                .ForMember(dest => dest.IndoorFeatures, opt => opt.Ignore()) // Manual mapping later
+                .ForMember(dest => dest.Units, opt => opt.Ignore()) // Manual mapping later
+                .ForMember(dest => dest.PolicyDescriptions, opt => opt.Ignore()); // Manual mapping later
+
 
             CreateMap<Unit, UnitDto>().ReverseMap();
-            
+
             CreateMap<UpdateUnitRequestDto, Unit>().ReverseMap();
 
             CreateMap<Property, PropertyDto>().ReverseMap();

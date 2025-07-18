@@ -2,8 +2,6 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 COPY . .
-RUN dotnet tool install --global dotnet-ef
-ENV PATH="$PATH:/root/.dotnet/tools"
 RUN dotnet restore
 RUN dotnet publish -c Release -o /app/publish
 
@@ -14,6 +12,10 @@ COPY --from=build /app/publish .
 ENTRYPOINT ["dotnet", "KejaHUnt_PropertiesAPI.dll"]
 
 # Migration stage (keeps source + tools)
-FROM build AS migrations
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS migrations
 WORKDIR /app
+COPY . .
+RUN dotnet restore
+RUN dotnet tool install --global dotnet-ef
+ENV PATH="$PATH:/root/.dotnet/tools"
 ENTRYPOINT ["dotnet", "ef", "database", "update"]

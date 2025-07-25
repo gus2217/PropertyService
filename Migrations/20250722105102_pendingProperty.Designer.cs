@@ -3,6 +3,7 @@ using System;
 using KejaHUnt_PropertiesAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace KejaHUnt_PropertiesAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250722105102_pendingProperty")]
+    partial class pendingProperty
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -118,33 +121,6 @@ namespace KejaHUnt_PropertiesAPI.Migrations
                     b.ToTable("OutDoorFeatures");
                 });
 
-            modelBuilder.Entity("KejaHUnt_PropertiesAPI.Models.Domain.PendingPolicyDescription", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<long>("PendingPropertyId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("PolicyId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PendingPropertyId");
-
-                    b.HasIndex("PolicyId");
-
-                    b.ToTable("PendingPolicyDescriptions");
-                });
-
             modelBuilder.Entity("KejaHUnt_PropertiesAPI.Models.Domain.PendingProperty", b =>
                 {
                     b.Property<long>("Id")
@@ -159,10 +135,6 @@ namespace KejaHUnt_PropertiesAPI.Migrations
 
                     b.Property<Guid?>("DocumentId")
                         .HasColumnType("uuid");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<bool>("IsApproved")
                         .HasColumnType("boolean");
@@ -220,6 +192,9 @@ namespace KejaHUnt_PropertiesAPI.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<long?>("PendingPropertyId")
+                        .HasColumnType("bigint");
+
                     b.Property<long>("PolicyId")
                         .HasColumnType("bigint");
 
@@ -227,6 +202,8 @@ namespace KejaHUnt_PropertiesAPI.Migrations
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PendingPropertyId");
 
                     b.HasIndex("PolicyId");
 
@@ -249,10 +226,6 @@ namespace KejaHUnt_PropertiesAPI.Migrations
 
                     b.Property<Guid?>("DocumentId")
                         .HasColumnType("uuid");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<string>("Location")
                         .IsRequired()
@@ -388,27 +361,12 @@ namespace KejaHUnt_PropertiesAPI.Migrations
                         .HasForeignKey("PendingPropertyId");
                 });
 
-            modelBuilder.Entity("KejaHUnt_PropertiesAPI.Models.Domain.PendingPolicyDescription", b =>
-                {
-                    b.HasOne("KejaHUnt_PropertiesAPI.Models.Domain.PendingProperty", "PendingProperty")
-                        .WithMany("PendingPolicyDescriptions")
-                        .HasForeignKey("PendingPropertyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("KejaHUnt_PropertiesAPI.Models.Domain.Policy", "Policy")
-                        .WithMany()
-                        .HasForeignKey("PolicyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("PendingProperty");
-
-                    b.Navigation("Policy");
-                });
-
             modelBuilder.Entity("KejaHUnt_PropertiesAPI.Models.Domain.PolicyDescription", b =>
                 {
+                    b.HasOne("KejaHUnt_PropertiesAPI.Models.Domain.PendingProperty", null)
+                        .WithMany("PolicyDescriptions")
+                        .HasForeignKey("PendingPropertyId");
+
                     b.HasOne("KejaHUnt_PropertiesAPI.Models.Domain.Policy", "Policy")
                         .WithMany("PolicyDescriptions")
                         .HasForeignKey("PolicyId")
@@ -416,7 +374,7 @@ namespace KejaHUnt_PropertiesAPI.Migrations
                         .IsRequired();
 
                     b.HasOne("KejaHUnt_PropertiesAPI.Models.Domain.Property", "Property")
-                        .WithMany()
+                        .WithMany("PolicyDescriptions")
                         .HasForeignKey("PropertyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -464,7 +422,7 @@ namespace KejaHUnt_PropertiesAPI.Migrations
 
                     b.Navigation("OutdoorFeatures");
 
-                    b.Navigation("PendingPolicyDescriptions");
+                    b.Navigation("PolicyDescriptions");
 
                     b.Navigation("Units");
                 });
@@ -476,6 +434,8 @@ namespace KejaHUnt_PropertiesAPI.Migrations
 
             modelBuilder.Entity("KejaHUnt_PropertiesAPI.Models.Domain.Property", b =>
                 {
+                    b.Navigation("PolicyDescriptions");
+
                     b.Navigation("Units");
                 });
 #pragma warning restore 612, 618

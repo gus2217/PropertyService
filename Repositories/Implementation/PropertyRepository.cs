@@ -23,6 +23,14 @@ namespace KejaHUnt_PropertiesAPI.Repositories.Implementation
             _featureRepository = featureRepository;
         }
 
+        public async Task<Property> AddAsync(Property property)
+        {
+            await _dbContext.Properties.AddAsync(property);
+            await _dbContext.SaveChangesAsync();
+
+            return property;
+        }
+
         public async Task<Property> CreatePropertyAsync(Property property, long[] generalFeatureIds, long[] indoorFeaturesIds, long[] outdoorFeaturesIds)
         {
             // Fetch the actual GeneralFeatures from DB using IDs
@@ -64,13 +72,25 @@ namespace KejaHUnt_PropertiesAPI.Repositories.Implementation
 
         public async Task<IEnumerable<Property>> GetAllAsync()
         {
-            return await _dbContext.Properties.Include(x => x.Units).Include(f => f.IndoorFeatures).Include(f => f.OutdoorFeatures).Include(f => f.GeneralFeatures).Include(f => f.PolicyDescriptions).ToListAsync();
+            return await _dbContext.Properties.Include(x => x.Units).Include(f => f.IndoorFeatures).Include(f => f.OutdoorFeatures).Include(f => f.GeneralFeatures).ToListAsync();
         }
 
         public async Task<Property?> GetPropertyByIdAsync(long id)
         {
-            return await _dbContext.Properties.Include(x => x.Units).Include(f => f.IndoorFeatures).Include(f => f.OutdoorFeatures).Include(f => f.GeneralFeatures).Include(f => f.PolicyDescriptions).FirstOrDefaultAsync(x => x.Id == id);
+            return await _dbContext.Properties.Include(x => x.Units).Include(f => f.IndoorFeatures).Include(f => f.OutdoorFeatures).Include(f => f.GeneralFeatures).FirstOrDefaultAsync(x => x.Id == id);
         }
+
+        public async Task<IEnumerable<Property>> GetPropertyByEmail(string email)
+        {
+            return await _dbContext.Properties
+                .Include(x => x.Units)
+                .Include(f => f.IndoorFeatures)
+                .Include(f => f.OutdoorFeatures)
+                .Include(f => f.GeneralFeatures)
+                .Where(x => x.Email == email)
+                .ToListAsync();
+        }
+
 
         public async Task<Property?> UpdateAsync(long id, UpdatePropertyRequestDto request)
         {
@@ -78,7 +98,6 @@ namespace KejaHUnt_PropertiesAPI.Repositories.Implementation
                 .Include(p => p.GeneralFeatures)
                 .Include(p => p.IndoorFeatures)
                 .Include(p => p.OutdoorFeatures)
-                .Include(p => p.PolicyDescriptions)
                 .Include(p => p.Units)
                 .FirstOrDefaultAsync(p => p.Id == id);
 
@@ -104,7 +123,6 @@ namespace KejaHUnt_PropertiesAPI.Repositories.Implementation
             property.GeneralFeatures?.Clear();
             property.IndoorFeatures?.Clear();
             property.OutdoorFeatures?.Clear();
-            property.PolicyDescriptions?.Clear();
 
             var generalFeatures = await _dbContext.GeneralFeatures
                 .Where(f => request.GeneralFeatures.Contains(f.Id))

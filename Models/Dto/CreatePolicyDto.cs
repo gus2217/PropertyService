@@ -6,6 +6,6 @@
 
         // Foreign key
         public long PolicyId { get; set; }
-        public long PropertyId { get; set; }
+        public long PendingPropertyId { get; set; }
     }
 }

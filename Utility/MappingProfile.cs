@@ -32,8 +32,7 @@ namespace KejaHUnt_PropertiesAPI.Utility
                 .ForMember(dest => dest.GeneralFeatures, opt => opt.Ignore()) // Manual mapping later
                 .ForMember(dest => dest.OutdoorFeatures, opt => opt.Ignore()) // Manual mapping later
                 .ForMember(dest => dest.IndoorFeatures, opt => opt.Ignore()) // Manual mapping later
-                .ForMember(dest => dest.Units, opt => opt.Ignore()) // Manual mapping later
-                .ForMember(dest => dest.PolicyDescriptions, opt => opt.Ignore()); // Manual mapping later
+                .ForMember(dest => dest.Units, opt => opt.Ignore()); // Manual mapping later
 
 
             CreateMap<Unit, UnitDto>().ReverseMap();
@@ -41,6 +40,8 @@ namespace KejaHUnt_PropertiesAPI.Utility
             CreateMap<UpdateUnitRequestDto, Unit>().ReverseMap();
 
             CreateMap<Property, PropertyDto>().ReverseMap();
+            CreateMap<Property, PendingProperty>().ReverseMap();
+            CreateMap<PendingProperty, PendingPropertyDto>().ReverseMap();
 
             CreateMap<GeneralFeatures, FeaturesDto>().ReverseMap();
             CreateMap<IndoorFeatures, FeaturesDto>().ReverseMap();
@@ -48,6 +49,18 @@ namespace KejaHUnt_PropertiesAPI.Utility
             CreateMap<CreatePolicyDto, PolicyDescription>().ReverseMap();
             CreateMap<Policy, PolicyDto>().ReverseMap();
             CreateMap<PolicyDescription, PolicydescriptionDto>().ReverseMap();
+            CreateMap<PendingPolicyDescription, CreatePolicyDto>().ReverseMap();
+            CreateMap<PendingPolicyDescription, PolicydescriptionDto>().ReverseMap();
+            CreateMap<PolicyDescription, PendingPolicyDescription>().ReverseMap();
+            // Property -> CreatePropertyRequestDto
+            CreateMap<PendingProperty, PendingPropertyRequestDto>()
+                .ForMember(dest => dest.GeneralFeatures, opt => opt.MapFrom(src => src.GeneralFeatures.Select(gf => gf.Id)))
+                .ForMember(dest => dest.OutdoorFeatures, opt => opt.MapFrom(src => src.OutdoorFeatures.Select(gf => gf.Id)))
+                .ForMember(dest => dest.IndoorFeatures, opt => opt.MapFrom(src => src.IndoorFeatures.Select(gf => gf.Id)))
+                .ReverseMap()
+                .ForMember(dest => dest.GeneralFeatures, opt => opt.Ignore()) // Manual mapping later
+                .ForMember(dest => dest.OutdoorFeatures, opt => opt.Ignore()) // Manual mapping later
+                .ForMember(dest => dest.IndoorFeatures, opt => opt.Ignore()); // Manual mapping later
 
         }
     }

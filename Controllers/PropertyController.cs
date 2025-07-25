@@ -52,16 +52,6 @@ namespace KejaHUnt_PropertiesAPI.Controllers
             return Ok(_mapper.Map<PropertyDto>(property));
         }
 
-/*
-        [HttpGet]
-        public async Task<IActionResult> GetAllAsync()
-        {
-            var properties = await _propertyRepository.GetAllAsync();
-
-            return Ok(_mapper.Map<List<PropertyDto>>(properties));
-        }
-*/
-//Added for debugging ***********************************************************************
         [HttpGet]
         public async Task<IActionResult> GetAllAsync()
         {

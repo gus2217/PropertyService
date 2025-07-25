@@ -50,8 +50,8 @@ namespace KejaHUnt_PropertiesAPI.Repositories.Implementation
 
         public async Task<PolicydescriptionDto> AddPolicyDescriptionAsync(PolicyDescription request)
         {
-            var policyDescription = _mapper.Map<PendingPolicyDescription>(request);
-            await _dbContext.PendingPolicyDescriptions.AddAsync(policyDescription);
+            var policyDescription = _mapper.Map<PolicyDescription>(request);
+            await _dbContext.PolicyDescriptions.AddAsync(policyDescription);
             await _dbContext.SaveChangesAsync();
 
             return _mapper.Map<PolicydescriptionDto>(policyDescription);

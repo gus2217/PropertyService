@@ -13,5 +13,6 @@
         public ICollection<GeneralFeatures?> GeneralFeatures { get; set; } = new List<GeneralFeatures>();
         public ICollection<IndoorFeatures?> IndoorFeatures { get; set; } = new List<IndoorFeatures>();
         public ICollection<OutDoorFeatures?> OutdoorFeatures { get; set; } = new List<OutDoorFeatures>();
+        public ICollection<PolicyDescription?> PolicyDescriptions { get; set; } = new List<PolicyDescription>();
     }
 }

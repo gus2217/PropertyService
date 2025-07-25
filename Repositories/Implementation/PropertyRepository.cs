@@ -72,12 +72,12 @@ namespace KejaHUnt_PropertiesAPI.Repositories.Implementation
 
         public async Task<IEnumerable<Property>> GetAllAsync()
         {
-            return await _dbContext.Properties.Include(x => x.Units).Include(f => f.IndoorFeatures).Include(f => f.OutdoorFeatures).Include(f => f.GeneralFeatures).ToListAsync();
+            return await _dbContext.Properties.Include(x => x.Units).Include(f => f.IndoorFeatures).Include(f => f.OutdoorFeatures).Include(f => f.GeneralFeatures).Include(p => p.PolicyDescriptions).ToListAsync();
         }
 
         public async Task<Property?> GetPropertyByIdAsync(long id)
         {
-            return await _dbContext.Properties.Include(x => x.Units).Include(f => f.IndoorFeatures).Include(f => f.OutdoorFeatures).Include(f => f.GeneralFeatures).FirstOrDefaultAsync(x => x.Id == id);
+            return await _dbContext.Properties.Include(x => x.Units).Include(f => f.IndoorFeatures).Include(f => f.OutdoorFeatures).Include(f => f.GeneralFeatures).Include(p => p.PolicyDescriptions).FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<IEnumerable<Property>> GetPropertyByEmail(string email)
@@ -87,6 +87,7 @@ namespace KejaHUnt_PropertiesAPI.Repositories.Implementation
                 .Include(f => f.IndoorFeatures)
                 .Include(f => f.OutdoorFeatures)
                 .Include(f => f.GeneralFeatures)
+                .Include(p => p.PolicyDescriptions)
                 .Where(x => x.Email == email)
                 .ToListAsync();
         }

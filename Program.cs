@@ -24,6 +24,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options
     => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IImageRepository, ImageRepository>();
 builder.Services.AddScoped<IPropertyRepository, PropertyRepository>();
+builder.Services.AddScoped<IPendingPropertyRepository, PendingPropertyRepository>();
+builder.Services.AddScoped<IPendingPropertyService, PendingPropertyService>();
 builder.Services.AddScoped<IUnitRepository, UnitRepository>();
 builder.Services.AddScoped<IFeatureRepository, FeatureRepository>();
 builder.Services.AddHttpClient(); 

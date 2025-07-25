@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace KejaHUnt_PropertiesAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250717113525_Initial")]
-    partial class Initial
+    [Migration("20250723083652_updateemail")]
+    partial class updateemail
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -67,7 +67,12 @@ namespace KejaHUnt_PropertiesAPI.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<long?>("PendingPropertyId")
+                        .HasColumnType("bigint");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("PendingPropertyId");
 
                     b.ToTable("GeneralFeatures");
                 });
@@ -84,7 +89,12 @@ namespace KejaHUnt_PropertiesAPI.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<long?>("PendingPropertyId")
+                        .HasColumnType("bigint");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("PendingPropertyId");
 
                     b.ToTable("IndoorFeatures");
                 });
@@ -101,9 +111,60 @@ namespace KejaHUnt_PropertiesAPI.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<long?>("PendingPropertyId")
+                        .HasColumnType("bigint");
+
                     b.HasKey("Id");
 
+                    b.HasIndex("PendingPropertyId");
+
                     b.ToTable("OutDoorFeatures");
+                });
+
+            modelBuilder.Entity("KejaHUnt_PropertiesAPI.Models.Domain.PendingProperty", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("DocumentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsApproved")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("SubmittedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("SubmittedByUserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PendingProperties");
                 });
 
             modelBuilder.Entity("KejaHUnt_PropertiesAPI.Models.Domain.Policy", b =>
@@ -135,6 +196,9 @@ namespace KejaHUnt_PropertiesAPI.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<long?>("PendingPropertyId")
+                        .HasColumnType("bigint");
+
                     b.Property<long>("PolicyId")
                         .HasColumnType("bigint");
 
@@ -142,6 +206,8 @@ namespace KejaHUnt_PropertiesAPI.Migrations
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PendingPropertyId");
 
                     b.HasIndex("PolicyId");
 
@@ -164,6 +230,10 @@ namespace KejaHUnt_PropertiesAPI.Migrations
 
                     b.Property<Guid?>("DocumentId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("Location")
                         .IsRequired()
@@ -203,6 +273,9 @@ namespace KejaHUnt_PropertiesAPI.Migrations
                     b.Property<int>("Floor")
                         .HasColumnType("integer");
 
+                    b.Property<long?>("PendingPropertyId")
+                        .HasColumnType("bigint");
+
                     b.Property<decimal>("Price")
                         .HasPrecision(18, 2)
                         .HasColumnType("numeric(18,2)");
@@ -222,6 +295,8 @@ namespace KejaHUnt_PropertiesAPI.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PendingPropertyId");
 
                     b.HasIndex("PropertyId");
 
@@ -273,8 +348,33 @@ namespace KejaHUnt_PropertiesAPI.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("KejaHUnt_PropertiesAPI.Models.Domain.GeneralFeatures", b =>
+                {
+                    b.HasOne("KejaHUnt_PropertiesAPI.Models.Domain.PendingProperty", null)
+                        .WithMany("GeneralFeatures")
+                        .HasForeignKey("PendingPropertyId");
+                });
+
+            modelBuilder.Entity("KejaHUnt_PropertiesAPI.Models.Domain.IndoorFeatures", b =>
+                {
+                    b.HasOne("KejaHUnt_PropertiesAPI.Models.Domain.PendingProperty", null)
+                        .WithMany("IndoorFeatures")
+                        .HasForeignKey("PendingPropertyId");
+                });
+
+            modelBuilder.Entity("KejaHUnt_PropertiesAPI.Models.Domain.OutDoorFeatures", b =>
+                {
+                    b.HasOne("KejaHUnt_PropertiesAPI.Models.Domain.PendingProperty", null)
+                        .WithMany("OutdoorFeatures")
+                        .HasForeignKey("PendingPropertyId");
+                });
+
             modelBuilder.Entity("KejaHUnt_PropertiesAPI.Models.Domain.PolicyDescription", b =>
                 {
+                    b.HasOne("KejaHUnt_PropertiesAPI.Models.Domain.PendingProperty", null)
+                        .WithMany("PolicyDescriptions")
+                        .HasForeignKey("PendingPropertyId");
+
                     b.HasOne("KejaHUnt_PropertiesAPI.Models.Domain.Policy", "Policy")
                         .WithMany("PolicyDescriptions")
                         .HasForeignKey("PolicyId")
@@ -294,6 +394,10 @@ namespace KejaHUnt_PropertiesAPI.Migrations
 
             modelBuilder.Entity("KejaHUnt_PropertiesAPI.Models.Domain.Unit", b =>
                 {
+                    b.HasOne("KejaHUnt_PropertiesAPI.Models.Domain.PendingProperty", null)
+                        .WithMany("Units")
+                        .HasForeignKey("PendingPropertyId");
+
                     b.HasOne("KejaHUnt_PropertiesAPI.Models.Domain.Property", "Property")
                         .WithMany("Units")
                         .HasForeignKey("PropertyId")
@@ -316,6 +420,19 @@ namespace KejaHUnt_PropertiesAPI.Migrations
                         .HasForeignKey("PropertiesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("KejaHUnt_PropertiesAPI.Models.Domain.PendingProperty", b =>
+                {
+                    b.Navigation("GeneralFeatures");
+
+                    b.Navigation("IndoorFeatures");
+
+                    b.Navigation("OutdoorFeatures");
+
+                    b.Navigation("PolicyDescriptions");
+
+                    b.Navigation("Units");
                 });
 
             modelBuilder.Entity("KejaHUnt_PropertiesAPI.Models.Domain.Policy", b =>

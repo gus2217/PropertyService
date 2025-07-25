@@ -75,6 +75,17 @@ namespace KejaHUnt_PropertiesAPI.Controllers
             return Ok(_mapper.Map<PropertyDto>(property));
         }
 
+        [HttpGet]
+        [Route("{email}")]
+        public async Task<IActionResult> GetByEmail(string email)
+        {
+            var property = await _propertyRepository.GetPropertyByEmail(email);
+            if (property == null)
+                return NotFound();
+
+            return Ok(_mapper.Map<List<PropertyDto>>(property));
+        }
+
         [HttpPut]
         [Route("{id:long}")]
         public async Task<IActionResult> UpdatePropertyById([FromRoute] long id, [FromForm] UpdatePropertyRequestDto request)

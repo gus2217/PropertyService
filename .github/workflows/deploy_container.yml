@@ -21,24 +21,34 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
-      - name: Build and Push Docker Image
+      - name: Build and Push Runtime Image
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile
+          target: runtime
           push: true
           tags: kalukwo/kejahunt-propertyservice:latest
 
-#   trigger-remote:
-#     name: Trigger Remote Deployment
-#     needs: build
-#     runs-on: ubuntu-latest
+      - name: Build and Push Migration Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          target: migrations
+          push: true
+          tags: kalukwo/kejahunt-propertyservice:migrations
 
-#     steps:
-#       - name: Trigger remote workflow
-#         run: |
-#           curl -X POST \
-#             -H "Authorization: Bearer ${{ secrets.GCP_TRIGGER_TOKEN }}" \
-#             -H "Accept: application/vnd.github.v3+json" \
-#             https://api.github.com/repos/Kalukwo/KejaHUnTinfrastructure/actions/workflows/deploy.yml/dispatches \
-#             -d '{"ref":"main"}'
+  trigger-remote:
+    name: Trigger Remote Deployment
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger remote workflow
+        run: |
+          curl -X POST \
+            -H "Authorization: Bearer ${{ secrets.GCP_TRIGGER_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/Kalukwo/KejaHUnTinfrastructure/actions/workflows/deploy.yml/dispatches \
+            -d '{"ref":"main"}'

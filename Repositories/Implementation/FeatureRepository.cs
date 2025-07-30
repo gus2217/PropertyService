@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using KejaHUnt_PropertiesAPI.Data;
+using KejaHUnt_PropertiesAPI.Migrations;
 using KejaHUnt_PropertiesAPI.Models.Domain;
 using KejaHUnt_PropertiesAPI.Models.Dto;
 using KejaHUnt_PropertiesAPI.Repositories.Interface;
@@ -40,6 +41,15 @@ namespace KejaHUnt_PropertiesAPI.Repositories.Implementation
 
         public async Task<PolicydescriptionDto> CreatePolicyDescriptionAsync(CreatePolicyDto request)
         {
+            var policyDescription = _mapper.Map<PendingPolicyDescription>(request);
+            await _dbContext.PendingPolicyDescriptions.AddAsync(policyDescription);
+            await _dbContext.SaveChangesAsync();
+
+            return _mapper.Map<PolicydescriptionDto>(policyDescription);
+        }
+
+        public async Task<PolicydescriptionDto> AddPolicyDescriptionAsync(PolicyDescription request)
+        {
             var policyDescription = _mapper.Map<PolicyDescription>(request);
             await _dbContext.PolicyDescriptions.AddAsync(policyDescription);
             await _dbContext.SaveChangesAsync();
@@ -65,9 +75,9 @@ namespace KejaHUnt_PropertiesAPI.Repositories.Implementation
 
         public async Task<List<PolicyDto>> GetAllPoliciessAsync()
         {
-           return _mapper.Map<List<PolicyDto>>(await _dbContext.Policies
-                .Include(p => p.PolicyDescriptions)
-                .ToListAsync());
+            return _mapper.Map<List<PolicyDto>>(await _dbContext.Policies
+                 .Include(p => p.PolicyDescriptions)
+                 .ToListAsync());
         }
 
         public async Task<PolicyDto?> GetPolicyByIdAsync(long id)
@@ -75,6 +85,18 @@ namespace KejaHUnt_PropertiesAPI.Repositories.Implementation
             return _mapper.Map<PolicyDto>(await _dbContext.Policies
                 .Include(p => p.PolicyDescriptions)
                 .FirstOrDefaultAsync(p => p.Id == id));
+        }
+
+        public Task<List<PendingPolicyDescription?>> GetPolicyDescriptionByPropertyIdAsync(long id)
+        {
+            var policyDescription = _dbContext.PendingPolicyDescriptions
+               .Where(pd => pd.PendingPropertyId == id)
+               .ToListAsync();
+            if (policyDescription == null)
+            {
+                return null;
+            }
+            return policyDescription;
         }
 
         public async Task<PolicydescriptionDto?> UpdatePolicyDescriptionAsync(UpdatePolicyDescriptionDto request)

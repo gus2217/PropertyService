@@ -3,6 +3,7 @@ using System;
 using KejaHUnt_PropertiesAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace KejaHUnt_PropertiesAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250725092624_policy")]
+    partial class policy
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -220,6 +223,9 @@ namespace KejaHUnt_PropertiesAPI.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<long?>("PendingPropertyId")
+                        .HasColumnType("bigint");
+
                     b.Property<long>("PolicyId")
                         .HasColumnType("bigint");
 
@@ -227,6 +233,8 @@ namespace KejaHUnt_PropertiesAPI.Migrations
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PendingPropertyId");
 
                     b.HasIndex("PolicyId");
 
@@ -391,7 +399,7 @@ namespace KejaHUnt_PropertiesAPI.Migrations
             modelBuilder.Entity("KejaHUnt_PropertiesAPI.Models.Domain.PendingPolicyDescription", b =>
                 {
                     b.HasOne("KejaHUnt_PropertiesAPI.Models.Domain.PendingProperty", "PendingProperty")
-                        .WithMany("PendingPolicyDescriptions")
+                        .WithMany()
                         .HasForeignKey("PendingPropertyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -409,6 +417,10 @@ namespace KejaHUnt_PropertiesAPI.Migrations
 
             modelBuilder.Entity("KejaHUnt_PropertiesAPI.Models.Domain.PolicyDescription", b =>
                 {
+                    b.HasOne("KejaHUnt_PropertiesAPI.Models.Domain.PendingProperty", null)
+                        .WithMany("PolicyDescriptions")
+                        .HasForeignKey("PendingPropertyId");
+
                     b.HasOne("KejaHUnt_PropertiesAPI.Models.Domain.Policy", "Policy")
                         .WithMany("PolicyDescriptions")
                         .HasForeignKey("PolicyId")
@@ -416,7 +428,7 @@ namespace KejaHUnt_PropertiesAPI.Migrations
                         .IsRequired();
 
                     b.HasOne("KejaHUnt_PropertiesAPI.Models.Domain.Property", "Property")
-                        .WithMany("PolicyDescriptions")
+                        .WithMany()
                         .HasForeignKey("PropertyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -464,7 +476,7 @@ namespace KejaHUnt_PropertiesAPI.Migrations
 
                     b.Navigation("OutdoorFeatures");
 
-                    b.Navigation("PendingPolicyDescriptions");
+                    b.Navigation("PolicyDescriptions");
 
                     b.Navigation("Units");
                 });
@@ -476,8 +488,6 @@ namespace KejaHUnt_PropertiesAPI.Migrations
 
             modelBuilder.Entity("KejaHUnt_PropertiesAPI.Models.Domain.Property", b =>
                 {
-                    b.Navigation("PolicyDescriptions");
-
                     b.Navigation("Units");
                 });
 #pragma warning restore 612, 618

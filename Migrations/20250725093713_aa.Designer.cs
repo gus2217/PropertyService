@@ -3,6 +3,7 @@ using System;
 using KejaHUnt_PropertiesAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace KejaHUnt_PropertiesAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250725093713_aa")]
+    partial class aa
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -416,7 +419,7 @@ namespace KejaHUnt_PropertiesAPI.Migrations
                         .IsRequired();
 
                     b.HasOne("KejaHUnt_PropertiesAPI.Models.Domain.Property", "Property")
-                        .WithMany("PolicyDescriptions")
+                        .WithMany()
                         .HasForeignKey("PropertyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -476,8 +479,6 @@ namespace KejaHUnt_PropertiesAPI.Migrations
 
             modelBuilder.Entity("KejaHUnt_PropertiesAPI.Models.Domain.Property", b =>
                 {
-                    b.Navigation("PolicyDescriptions");
-
                     b.Navigation("Units");
                 });
 #pragma warning restore 612, 618

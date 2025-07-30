@@ -30,7 +30,7 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(provider =>
     var connectionString = builder.Configuration.GetConnectionString("Redis") ?? "redis:6379";
     return ConnectionMultiplexer.Connect(connectionString);
 });
-
+builder.Services.AddScoped<ICacheService, CacheService>();
 builder.Services.AddScoped<IImageRepository, ImageRepository>();
 builder.Services.AddScoped<IPropertyRepository, PropertyRepository>();
 builder.Services.AddScoped<IPendingPropertyRepository, PendingPropertyRepository>();
